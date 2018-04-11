@@ -55,7 +55,6 @@ public class WatsonSpeechToText : MonoBehaviour
         _speechToText.EnableTimestamps = false;
         _speechToText.SilenceThreshold = 0.03f;
         _speechToText.MaxAlternatives = 1;
-        _speechToText.EnableContinousRecognition = true;
         _speechToText.EnableInterimResults = true;
         _speechToText.OnError = OnSpeachToTextError;
 
@@ -238,7 +237,7 @@ public class WatsonSpeechToText : MonoBehaviour
 
                     SpeechRecognized(text, alt.confidence, res.final);
                     
-                    Debug.Log(resp);
+                    //Debug.Log(resp);
                 }            
         
     }

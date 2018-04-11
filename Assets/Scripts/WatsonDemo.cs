@@ -1,7 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using IBM.Watson.DeveloperCloud.Services.RetrieveAndRank.v1;
 using UnityEngine;
 using UnityEngine.UI;
 

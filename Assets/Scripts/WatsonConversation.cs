@@ -3,7 +3,8 @@ using UnityEngine;
 using IBM.Watson.DeveloperCloud.Services.Conversation.v1;
 using IBM.Watson.DeveloperCloud.Utilities;
 using FullSerializer;
-
+using IBM.Watson.DeveloperCloud.Connection;
+using System;
 
 public delegate void ConversationResponseDelegate(string text, string intent, float confidence);
 
@@ -42,16 +43,15 @@ public class WatsonConversation : MonoBehaviour
             context = _context
         };
 
-        if (!_conversationApi.Message(OnConversationResponse, WorkspaceId, messageRequest))
+        if (!_conversationApi.Message(OnConversationResponse, OnConversationError, WorkspaceId, messageRequest))
         {
             Debug.LogError("Failed to send the message to Conversation service!");
         }
 
     }
 
-    private void OnConversationResponse(object resp, string data)
+    private void OnConversationResponse(object resp, Dictionary<string, object> customData)
     {
-
         if (resp != null)
         {
             //  Convert resp to fsdata
@@ -104,6 +104,13 @@ public class WatsonConversation : MonoBehaviour
             }
         }
     }
+
+    private void OnConversationError(RESTConnector.Error error, Dictionary<string, object> customData)
+    {
+        Debug.LogError("Conversation Error: " + error.ErrorMessage);
+    }
+
+ 
 
 
 }

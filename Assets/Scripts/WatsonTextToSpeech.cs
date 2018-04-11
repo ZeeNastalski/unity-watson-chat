@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using IBM.Watson.DeveloperCloud.Connection;
 using IBM.Watson.DeveloperCloud.Services.TextToSpeech.v1;
 using IBM.Watson.DeveloperCloud.Utilities;
 using UnityEngine;
@@ -28,15 +30,23 @@ public class WatsonTextToSpeech : MonoBehaviour
 
     public void Say(string text)
     {
-        if (!_textToSpeech.ToSpeech(text, OnSynthetize, true))
+        if (!_textToSpeech.ToSpeech(OnSynthetize, OnFail, text, true))
         {
             Debug.Log("Error sending text to speech.");
         }                    
     }
 
-    private void OnSynthetize(AudioClip clip, string customdata)
+   
+
+    private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
+    {
+        string errorMessage = string.Format("ExampleTextToSpeech.OnFail()", "Error received: {0}", error.ToString());
+        Debug.LogError(errorMessage);
+    }
+
+    private void OnSynthetize(AudioClip clip, Dictionary<string, object> customData)
     {
         AudioSrc.clip = clip;
         AudioSrc.Play();
-    }
+    }    
 }
