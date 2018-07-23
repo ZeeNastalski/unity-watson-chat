@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class WatsonDemo : MonoBehaviour
 {
+    public bool ShowIntentConfidence = false;
     public InputField TextInputField;
     public Text ConversationText;
     public Button TalkButton;
@@ -13,6 +14,8 @@ public class WatsonDemo : MonoBehaviour
     public WatsonSpeechToText SpeechToText;
     public WatsonTextToSpeech TextToSpeech;
     public WatsonConversation Conversation;
+
+
 
     void OnEnable ()
     {
@@ -30,7 +33,14 @@ public class WatsonDemo : MonoBehaviour
             text = "";
         }
 
-        ConversationText.text += String.Format("Watson: {0} (#{1} {2:0.000})", text, intent, confidence);
+        if (ShowIntentConfidence)
+        {
+            ConversationText.text += String.Format("Watson: {0} (#{1} {2:0.000})", text, intent, confidence);
+        }
+        else
+        {
+            ConversationText.text += String.Format("Watson: {0}", text);
+        }
 
         //Send the conversation response to speech synthesis service
         TextToSpeech.Say(text);

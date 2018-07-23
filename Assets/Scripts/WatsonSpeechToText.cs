@@ -227,8 +227,7 @@ public class WatsonSpeechToText : MonoBehaviour
                     _stopListeningTimeoutCoroutine = StartCoroutine(StopTalkingTimeout(InactivityTimeoutSec));
 
                     string text = alt.transcript;
-                    string resp = string.Format("{0} ({1}, {2:0.00})\n", text, res.final ? "Final" : "Interim",
-                        alt.confidence);
+                    
 
                     if (res.final)
                     {
@@ -236,9 +235,10 @@ public class WatsonSpeechToText : MonoBehaviour
                     }
 
                     SpeechRecognized(text, alt.confidence, res.final);
-                    
+
+                    //string resp = string.Format("{0} ({1}, {2:0.00})\n", text, res.final ? "Final" : "Interim", alt.confidence);
                     //Debug.Log(resp);
-                }            
+        }            
         
     }
 
