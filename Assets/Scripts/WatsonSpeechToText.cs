@@ -22,13 +22,12 @@ public class WatsonSpeechToText : MonoBehaviour
     public bool PlayBackAudio = false;
     public float InactivityTimeoutSec = 6.0f;
 
-
-
     [Header("Credentials")]
+    public string ApiKey;
     public string Url;
-    public string User;
-    public string Password;
-    
+
+    [HideInInspector]
+    public bool IsReady = false;    
     
     private const int MIC_REC_BUFFER_LEN_SEC = 30;
     private const int MIC_FREQUENCY = 22050;
@@ -43,13 +42,29 @@ public class WatsonSpeechToText : MonoBehaviour
     private SpeechToText _speechToText;
 
     private List<float> _playBackAudioData;
+    private Credentials _credentials;
 
 
-    void Awake()
-    {       
-        Credentials sttCredentials = new Credentials(User, Password, Url);
-        _speechToText = new SpeechToText(sttCredentials);
+    void Start()
+    {
+        StartCoroutine(AuthenticateAndConfigure());        
+    }
 
+    IEnumerator AuthenticateAndConfigure()
+    {
+        TokenOptions iamTokenOptions = new TokenOptions()
+        {
+            IamApiKey = ApiKey,
+            IamUrl = "https://iam.bluemix.net/identity/token"
+        };
+
+        //  Create credentials using the IAM token options
+        _credentials = new Credentials(iamTokenOptions, Url);
+
+        while (!_credentials.HasIamTokenData())
+            yield return null;
+
+        _speechToText = new SpeechToText(_credentials);
         _speechToText.DetectSilence = true;
         _speechToText.EnableWordConfidence = false;
         _speechToText.EnableTimestamps = false;
@@ -58,6 +73,7 @@ public class WatsonSpeechToText : MonoBehaviour
         _speechToText.EnableInterimResults = true;
         _speechToText.OnError = OnSpeachToTextError;
 
+        IsReady = true;
     }
 
     private void OnSpeachToTextError(string error)
@@ -89,7 +105,7 @@ public class WatsonSpeechToText : MonoBehaviour
 
     public bool IsTalking()
     {
-		if(_speechToText == null) Debug.Log("STT null");
+		if(_speechToText == null) Debug.LogError("Speech To Text is null");
         return _speechToText.IsListening;
     }
     
@@ -97,9 +113,7 @@ public class WatsonSpeechToText : MonoBehaviour
     {
         if (!_speechToText.IsListening)
         {
-            Debug.Log("Start talking");
             _playBackAudioData = new List<float>();
-
 
             _audioChunkStartPosition = Microphone.GetPosition(Microphone.devices[0]);
 
@@ -118,7 +132,6 @@ public class WatsonSpeechToText : MonoBehaviour
     {
         if (_speechToText.IsListening)
         {
-            Debug.Log("Stop listening");
 
             StopCoroutine(_pushAudioChunkCroutine);
             _pushAudioChunkCroutine = null;
@@ -206,15 +219,12 @@ public class WatsonSpeechToText : MonoBehaviour
         _audioChunkStartPosition = endPosition;
 
         recording.MaxLevel = Mathf.Max(speechAudioData);
-        //Debug.Log("Pushing chunk length " + recording.Clip.length);
 
         _speechToText.OnListen(recording);
-
-
     }
 
 
-    private void OnSpeechRecognize(SpeechRecognitionEvent result)
+    private void OnSpeechRecognize(SpeechRecognitionEvent result, Dictionary<string, object> customData)
     {
         
         if (result != null && result.results.Length > 0)
@@ -235,9 +245,6 @@ public class WatsonSpeechToText : MonoBehaviour
                     }
 
                     SpeechRecognized(text, alt.confidence, res.final);
-
-                    //string resp = string.Format("{0} ({1}, {2:0.00})\n", text, res.final ? "Final" : "Interim", alt.confidence);
-                    //Debug.Log(resp);
         }            
         
     }

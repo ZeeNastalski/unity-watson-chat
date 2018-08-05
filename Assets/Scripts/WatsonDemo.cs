@@ -1,11 +1,14 @@
 ﻿
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 
 public class WatsonDemo : MonoBehaviour
 {
+    private const float WAIT_FOR_SERVICES_TIMEOUT_SEC = 5.0f;
+
     public bool ShowIntentConfidence = false;
     public InputField TextInputField;
     public Text ConversationText;
@@ -24,6 +27,38 @@ public class WatsonDemo : MonoBehaviour
         SpeechToText.StoppedListening += OnSpeechToTextStop;
 
         Conversation.ConversationResponse += OnConversationResponse;
+
+        StartCoroutine(WaitForServicesReady());
+    }
+
+    IEnumerator WaitForServicesReady()
+    {
+        float startWaitTime = Time.time;
+        bool allServicesReady = false;
+
+        TalkButton.interactable = false;
+        
+
+        while (Time.time - startWaitTime < WAIT_FOR_SERVICES_TIMEOUT_SEC)
+        {
+            yield return null;
+
+            if(SpeechToText.IsReady && TextToSpeech.IsReady && Conversation.IsReady)
+            {
+                allServicesReady = true;                
+                break;
+            }
+        }
+
+
+        if(allServicesReady)
+        {
+            TalkButton.interactable = true;
+        }
+        else
+        {
+            ConversationText.text = "Error. Some of the services failed to authenticate. Please verify ApiKey and Url fields are correct for each service.";
+        }
     }
 
     private void OnConversationResponse(string text, string intent, float confidence)
@@ -52,6 +87,8 @@ public class WatsonDemo : MonoBehaviour
         SpeechToText.SpeechError -= SpeechToTextError;
         SpeechToText.StoppedListening -= OnSpeechToTextStop;
         Conversation.ConversationResponse -= OnConversationResponse;
+
+        StopAllCoroutines();
     }
 
 

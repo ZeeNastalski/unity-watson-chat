@@ -707,10 +707,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b60cdf225bba48245ad0bb25e40f1cf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Url: https://gateway.watsonplatform.net/conversation/api
-  User: 
-  Password: 
+  ApiKey: 
+  Url: https://gateway-syd.watsonplatform.net/assistant/api
   WorkspaceId: 
+  IsReady: 0
 --- !u!114 &840650860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -725,9 +725,9 @@ MonoBehaviour:
   AudioSrc: {fileID: 638685869}
   PlayBackAudio: 0
   InactivityTimeoutSec: 6
-  Url: https://stream.watsonplatform.net/speech-to-text/api
-  User: 
-  Password: 
+  ApiKey: 
+  Url: https://gateway-syd.watsonplatform.net/speech-to-text/api
+  IsReady: 0
 --- !u!114 &840650861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -741,9 +741,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AudioSrc: {fileID: 276239022}
   Voice: 0
-  Url: https://stream.watsonplatform.net/text-to-speech/api
-  User: 
-  Password: 
+  ApiKey: 
+  Url: https://gateway-syd.watsonplatform.net/text-to-speech/api
+  IsReady: 0
 --- !u!1 &897034212
 GameObject:
   m_ObjectHideFlags: 0
@@ -1459,7 +1459,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter text...
+  m_Text: Press "Talk" and say something...
 --- !u!222 &1712903672
 CanvasRenderer:
   m_ObjectHideFlags: 0

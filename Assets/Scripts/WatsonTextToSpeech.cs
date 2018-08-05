@@ -13,20 +13,40 @@ public class WatsonTextToSpeech : MonoBehaviour
     public VoiceType Voice;
 
     [Header("Credentials")]
+    public string ApiKey;
     public string Url;
-    public string User;
-    public string Password;
-    
+
+
+    [HideInInspector]
+    public bool IsReady = false;
 
     private TextToSpeech _textToSpeech;
+    private Credentials _credentials;
 
     // Use this for initialization
-    void Awake () {
-	    Credentials	ttsCredential = new Credentials(User, Password, Url);
-        _textToSpeech = new TextToSpeech(ttsCredential);
-        _textToSpeech.Voice = Voice;
+    void Start () {
+        StartCoroutine(AuthenticateAndConfigure());
     }
 
+    private IEnumerator AuthenticateAndConfigure()
+    {
+        TokenOptions iamTokenOptions = new TokenOptions()
+        {
+            IamApiKey = ApiKey,
+            IamUrl = "https://iam.bluemix.net/identity/token"
+        };
+
+        // Create credentials using the IAM token options
+        _credentials = new Credentials(iamTokenOptions, Url);
+
+        while (!_credentials.HasIamTokenData())
+            yield return null;
+
+        _textToSpeech = new TextToSpeech(_credentials);
+        _textToSpeech.Voice = Voice;
+
+        IsReady = true;    
+    }
 
     public void Say(string text)
     {

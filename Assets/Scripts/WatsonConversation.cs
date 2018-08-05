@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using IBM.Watson.DeveloperCloud.Services.Conversation.v1;
 using IBM.Watson.DeveloperCloud.Utilities;
@@ -13,22 +14,43 @@ public class WatsonConversation : MonoBehaviour
     public ConversationResponseDelegate ConversationResponse = delegate { };
 
     [Header("Credentials")]
+    public string ApiKey;
     public string Url;
-    public string User;
-    public string Password;    
     public string WorkspaceId;
+
+    [HideInInspector]
+    public bool IsReady = false;
 
     private Conversation _conversationApi;
 
     private Dictionary<string, object> _context; // context to persist
     private fsSerializer _serializer = new fsSerializer();
+    private Credentials _credentials;
 
     // Use this for initialization
     void Start()
     {
-        Credentials conversationCred = new Credentials(User, Password, Url);
-        _conversationApi = new Conversation(conversationCred);
+        StartCoroutine(AuthenticateAndConfigure());        
+    }
+
+    private IEnumerator AuthenticateAndConfigure()
+    {
+        TokenOptions iamTokenOptions = new TokenOptions()
+        {
+            IamApiKey = ApiKey,
+            IamUrl = "https://iam.bluemix.net/identity/token"
+        };
+
+        // Create credentials using the IAM token options
+        _credentials = new Credentials(iamTokenOptions, Url);
+
+        while (!_credentials.HasIamTokenData())
+            yield return null;
+       
+        _conversationApi = new Conversation(_credentials);
         _conversationApi.VersionDate = "2017-07-26";
+
+        IsReady = true;
     }
 
 
